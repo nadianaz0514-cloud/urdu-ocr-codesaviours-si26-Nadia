@@ -2,7 +2,7 @@ import streamlit as st
 from transformers import (
     VisionEncoderDecoderModel,
     AutoImageProcessor,
-    AutoTokenizer
+    RobertaTokenizer
 )
 from PIL import Image
 import torch
@@ -28,8 +28,8 @@ def load_model():
         model_path
     )
 
-    # Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
+    # Load Roberta tokenizer directly
+    tokenizer = RobertaTokenizer.from_pretrained(
         model_path,
         use_fast=False
     )
@@ -65,13 +65,11 @@ if uploaded_file is not None:
 
     if st.button("Extract Urdu Text"):
 
-        # Process image
         pixel_values = image_processor(
             images=image,
             return_tensors="pt"
         ).pixel_values
 
-        # Generate prediction
         with torch.no_grad():
 
             generated_ids = model.generate(
@@ -79,19 +77,15 @@ if uploaded_file is not None:
                 max_length=128
             )
 
-        # Convert prediction to text
         text = tokenizer.batch_decode(
             generated_ids,
             skip_special_tokens=True
         )[0].strip()
 
         if text:
-
             st.subheader("Extracted Urdu Text")
             st.write(text)
-
         else:
-
             st.write(
                 "Could not extract text from this image."
             )
