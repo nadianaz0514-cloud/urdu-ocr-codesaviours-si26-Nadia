@@ -1,6 +1,6 @@
 
 import streamlit as st
-from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+from transformers import TrOCRProcessor, VisionEncoderDecoderModel, AutoImageProcessor, RobertaTokenizer
 from PIL import Image
 import torch
 
@@ -18,9 +18,20 @@ model_path = "Nadianaz/SI26-urdu-ocr-model-nadia"
 
 @st.cache_resource
 def load_model():
-    processor = TrOCRProcessor.from_pretrained(model_path, use_fast=False)
+    image_processor = AutoImageProcessor.from_pretrained(model_path)
+    tokenizer = RobertaTokenizer.from_pretrained(
+        model_path,
+        use_fast=False
+    )
+
+    processor = TrOCRProcessor(
+        image_processor=image_processor,
+        tokenizer=tokenizer
+    )
+
     model = VisionEncoderDecoderModel.from_pretrained(model_path)
     model.eval()
+
     return processor, model
 
 processor, model = load_model()
