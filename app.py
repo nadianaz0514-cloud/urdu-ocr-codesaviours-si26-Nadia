@@ -18,7 +18,7 @@ model_path = "Nadianaz/SI26-urdu-ocr-model-nadia"
 
 @st.cache_resource
 def load_model():
-    processor = TrOCRProcessor.from_pretrained(model_path)
+    processor = TrOCRProcessor.from_pretrained(model_path, use_fast=False)
     model = VisionEncoderDecoderModel.from_pretrained(model_path)
     model.eval()
     return processor, model
